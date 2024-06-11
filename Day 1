@@ -1,1 +1,112 @@
+#Exercise: Sum of Two Numbers
 
+def sum(a,b):
+    return (a+b)
+
+a=int(input('Enter first number: '))
+b=int(input('Enter Second Number: '))
+print(f'The Sum is {sum(a,b)}')
+
+
+#Exercise: Area of a Circle
+
+def area(radius):
+    return (3.141592653*(radius*radius))
+
+radius=float(input('Enter the radius of circle: '))
+print(f'The area of circle is: {area(radius)}')
+
+
+#Exercise: Even or Odd
+
+number=int(input('Enter a number: '))
+if number % 2 ==0:
+    print(f"{number} is even.")
+else:
+    print(f"{number} is odd")
+
+
+#Exercise: Simple Calculator
+
+def sum(a,b):
+    return (a+b)
+def subtract(a,b):
+    return(a-b)
+def multiply(a,b):
+    return(a*b)
+def divide(a,b):
+    return(a/b)
+
+a=float(input('Enter first number: '))
+b=float(input('Enter second number: '))
+operation=str(input('Enter operation(+,-,*,/): '))
+if operation == '+':
+    print(f'The result is: {sum(a,b)}')
+elif operation == '-':
+    print(f'The result is: {subtract(a,b)}')
+elif operation == '*':
+    print(f'The result is: {multiply(a,b)}')
+elif operation == '/':
+    print(f'The result is: {divide(a,b)}')
+else:
+    print('Invalid Operator')
+
+
+#Exercise: Find the Largest Number
+
+num1=int(input('Enter first number: '))
+num2=int(input('Enter second number: '))
+num3=int(input('Enter third number: '))
+
+if num1>=num2 and num1>=num3:
+    largest=num1
+elif num2>=num1 and num2>=num3:
+    largest=num2
+else:
+    largest=num3
+print('The Largest number is:',largest)
+
+
+#Exercise: Reverse a String
+
+original_string=str(input('Enter a string: '))
+reversed_string=''.join(reversed(original_string))
+print('The reversed string is: ',reversed_string)
+
+def count_vowels(input_string):
+    vowels="aeiouAEIOU"
+    count=0
+    for char in input_string:
+        if char in vowels:
+            count+=1
+    return count
+        
+input_string=str(input('Enter a string: '))
+vowels_count= count_vowels(input_string)
+print('The number of vowels is ',vowels_count)
+
+
+#Exercise: Fibonacci Sequence
+
+def fibonacci(n):
+    fib_sequence=[0,1]
+    for i in range(2,n):
+        next_term = fib_sequence[-1]+ fib_sequence[-2]
+        fib_sequence.append(next_term)
+    return fib_sequence
+
+num_terms = int(input('How many terms?: '))
+fib_numbers=fibonacci(num_terms)
+print('Fibonacci Sequence: ',fib_numbers)
+
+
+#Exercise: Check for Palindrome
+
+def is_palindrome(s):
+    return s==s[::-1]
+
+Palindrome=str(input('Enter a string: '))
+if is_palindrome(Palindrome):
+    print(f'{Palindrome} is a palindrome')
+else:
+    print(f'{Palindrome} is not a palindrome')
