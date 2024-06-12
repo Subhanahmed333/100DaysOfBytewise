@@ -1,0 +1,145 @@
+# 1.Palindrome Checker
+
+def is_palindrome(s):
+    return s==s[::-1]
+
+palindrome = str(input('Enter a string: '))
+if is_palindrome(palindrome):
+    print(f'{palindrome} is a palindrome')
+else:
+    print(f'{palindrome} is not a palindrome')
+
+
+# 2.FizzBuzz
+
+for i in range(1, 101):
+    if (i%5==0) & (i%3==0):
+        print('FizzBuzz')
+    elif i%5==0:
+        print('Buzz')
+    elif i%3==0:
+        print('Fizz')
+    else:
+        print(i)
+
+
+
+# 3.Fibonacci Sequence
+
+def fibonacci(s):
+    fib_sequence=[0,1]
+    for i in range(2,s):
+        next_term=fib_sequence[-1]+fib_sequence[-2]
+        fib_sequence.append(next_term)
+    return fib_sequence
+
+num_terms = int(input('How many terms?: '))
+fib_numbers=fibonacci(num_terms)
+print('Fibonacci Sequence: ',fib_numbers)
+
+
+
+# 4.Prime Number Checker
+
+def is_prime(num):
+    if num<=1:
+        return False
+    for i in range(2,num):
+        if num%i==0:
+            return False
+    return True
+
+user_input=int(input('Enter a number: '))
+if is_prime(user_input):
+    print(f'{user_input} is a Prime number')
+else:
+    print(f'{user_input} is not a prime number')
+
+
+# 5. Guess the Number Game
+
+import random
+ran=random.randint(1,100)
+for i in range(1,int(10)):
+    guess_input=int(input('Enter a number between 1 to 100: '))
+
+    if ran > guess_input:
+        print('too low')
+    elif ran< guess_input:
+        print('too high')
+    elif ran==guess_input:
+        print('Correct Answer')
+        break
+
+
+
+# 6.List Comprehension
+
+squares = [x*x for x in range(1,11)]
+print(squares)
+
+
+
+# 7.Palindrome Sentences
+
+import string
+def is_palindrome(p):
+    return p==p[::-1]
+
+def process_input(input_text):
+    text_no_punc=input_text.translate(str.maketrans("","",string.punctuation)).lower()
+    words="".join(text_no_punc.split())
+    return words
+
+userinput=str(input('Enter a String: '))
+processed_input=process_input(userinput)
+if is_palindrome(processed_input):
+    print(f'{userinput} is a palindrome')
+else:
+    print(f'{userinput} is not a palindrome')
+
+
+
+# 8.Anagram Checker
+
+def anagram(str1,str2):
+    str1=str1.replace(" ","").lower()
+    str2=str2.replace(" ","").lower()
+    sorted_str1=sorted(str1)
+    sorted_str2=sorted(str2)
+    if sorted_str1 == sorted_str2:
+        return True
+    else:
+        return False
+
+first_input=str(input('Enter first String: '))
+second_input=str(input('Enter second string: '))
+if(anagram(first_input, second_input)):
+    print(f'{first_input} and {second_input} are anagram')
+else:
+    print(f'{first_input} and {second_input} are not anagram')
+
+
+
+# 9.Reverse Words in a Sentence
+
+def reverse_words(sentence):
+    words = sentence.split()
+    reversed_sentence=' '.join(reversed(words))
+    return reversed_sentence
+
+input_sentence=str(input('Enter a String: '))
+reversed_sentence=reverse_words(input_sentence)
+print(reversed_sentence)
+
+
+
+# 10.Temperature Converter
+
+def convertor(celsius):
+    kelvin = celsius+273.15
+    fahrenheit=(celsius*9/5)+32
+    print(f'{celsius} degrees Celsius is equal to {fahrenheit} degree Fahrenheit and {kelvin} degree Kelvin')
+
+input_celsius=float(input('Enter a number to convert from celsius to fahrenheit and kelvin: '))
+convertor(input_celsius)
