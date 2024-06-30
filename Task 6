@@ -1,0 +1,96 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+import pandas as pd
+
+# Exercise 1: Load a simple dataset (e.g., Iris dataset) and print the first 5 rows
+iris = load_iris()
+print("Exercise 1:")
+print(iris.data[:5])
+print()
+
+# Exercise 2: Implement a function that takes a dataset and returns the number of features and samples
+def dataset_info(dataset):
+    num_samples, num_features = dataset.data.shape
+    return num_samples, num_features
+
+# Example usage with Iris dataset
+num_samples, num_features = dataset_info(iris)
+print("Exercise 2:")
+print(f"Number of samples: {num_samples}")
+print(f"Number of features: {num_features}")
+print()
+
+# Exercise 3: Split a dataset into training and testing sets with an 80/20 split
+X_train, X_test, y_train, y_test = train_test_split(iris.data, iris.target, test_size=0.2, random_state=42)
+print("Exercise 3:")
+print(f"Training set size: {len(X_train)}")
+print(f"Testing set size: {len(X_test)}")
+print()
+
+# Exercise 4: Explore basic statistics of a dataset (mean, median, standard deviation)
+mean_values = np.mean(iris.data, axis=0)
+median_values = np.median(iris.data, axis=0)
+std_deviation = np.std(iris.data, axis=0)
+print("Exercise 4:")
+print(f"Mean values: {mean_values}")
+print(f"Median values: {median_values}")
+print(f"Standard deviation: {std_deviation}")
+print()
+
+# Exercise 5: Visualize the distribution of one feature using a histogram
+sepal_length = iris.data[:, 0]
+print("Exercise 5:")
+plt.hist(sepal_length, bins=20, edgecolor='black')
+plt.xlabel('Sepal Length')
+plt.ylabel('Frequency')
+plt.title('Distribution of Sepal Length')
+plt.show()
+
+# Exercise 6: Compute mean of a list of 10 numbers
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+mean = np.mean(numbers)
+print("Exercise 6:")
+print(f"Mean of the list: {mean}")
+print()
+
+# Exercise 7: Create a function to compute count, mean, median, and standard deviation of a list
+def compute_stats(numbers):
+    stats = {
+        'count': len(numbers),
+        'mean': np.mean(numbers),
+        'median': np.median(numbers),
+        'std_deviation': np.std(numbers)
+    }
+    return stats
+
+# Example usage
+numbers = [1, 2, 3, 4, 5]
+result = compute_stats(numbers)
+print("Exercise 7:")
+print(result)
+print()
+
+# Exercise 8: Generate a 5x5 matrix of random numbers and print it
+matrix = np.random.rand(5, 5)
+print("Exercise 8:")
+print(matrix)
+print()
+
+# Exercise 9: Load a CSV file into a Pandas DataFrame and print summary statistics
+# Replace 'your_dataset.csv' with your actual CSV file path
+df = pd.read_csv('your_dataset.csv')
+print("Exercise 9:")
+print(df.describe())
+print()
+
+# Exercise 10: Implement a simple linear regression model using Scikit-Learn and print model coefficients
+X = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)  # Feature
+y = np.array([2, 4, 5, 4, 5])  # Target
+model = LinearRegression()
+model.fit(X, y)
+print("Exercise 10:")
+print(f"Coefficient: {model.coef_[0]}")
+print(f"Intercept: {model.intercept_}")
