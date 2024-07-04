@@ -1,0 +1,86 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import gaussian_kde, ttest_ind
+from sklearn.datasets import load_iris
+
+iris = load_iris()
+df = pd.DataFrame(data=iris.data, columns=iris.feature_names)
+df['species'] = iris.target
+
+
+# Exercise 1
+
+sepal_length_mean = df['sepal length (cm)'].mean()
+sepal_length_median = df['sepal length (cm)'].median()
+sepal_length_mode = df['sepal length (cm)'].mode()[0]
+
+
+# Exercise 2
+
+petal_width_variance = df['petal width (cm)'].var()
+petal_width_std = df['petal width (cm)'].std()
+
+
+# Exercise 3
+summary_table = df.describe().loc[['mean', '50%', 'std']].rename(index={'50%': 'median'})
+summary_table.loc['variance'] = df.var()
+
+
+# Exercise 4
+
+sepal_length_counts = df['sepal length (cm)'].value_counts(normalize=True).sort_index()
+
+
+# Exercise 5
+
+plt.figure()
+plt.hist(df['sepal length (cm)'], bins=10, density=True, alpha=0.6, color='g')
+plt.title('Probability Distribution of Sepal Lengths')
+plt.xlabel('Sepal Length (cm)')
+plt.ylabel('Probability Density')
+plt.show()
+
+
+# Exercise 6
+
+petal_length_sorted = np.sort(df['petal length (cm)'])
+cdf = np.arange(1, len(petal_length_sorted) + 1) / len(petal_length_sorted)
+plt.figure()
+plt.plot(petal_length_sorted, cdf)
+plt.title('Cumulative Distribution Function (CDF) of Petal Lengths')
+plt.xlabel('Petal Length (cm)')
+plt.ylabel('Cumulative Probability')
+plt.show()
+
+
+# Exercise 7
+
+sepal_width = df['sepal width (cm)']
+pdf = gaussian_kde(sepal_width)
+x = np.linspace(sepal_width.min(), sepal_width.max(), 1000)
+plt.figure()
+plt.plot(x, pdf(x))
+plt.title('Probability Density Function (PDF) of Sepal Width')
+plt.xlabel('Sepal Width (cm)')
+plt.ylabel('Density')
+plt.show()
+
+
+# Exercise 8
+
+value = 5
+probability = (df['petal length (cm)'] > value).mean()
+
+
+# Exercise 9
+
+setosa_petal_length = df[df['species'] == 0]['petal length (cm)']
+versicolor_petal_length = df[df['species'] == 1]['petal length (cm)']
+t_stat, p_value = ttest_ind(setosa_petal_length, versicolor_petal_length)
+
+
+# Exercise 10
+
+covariance = df[['sepal length (cm)', 'sepal width (cm)']].cov().iloc[0, 1]
+correlation = df[['sepal length (cm)', 'sepal width (cm)']].corr().iloc[0, 1]
