@@ -1,0 +1,118 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+x = np.linspace(0, 10, 100)
+y1 = np.sin(x)
+y2 = np.cos(x)
+
+
+# Exercise 1:
+
+plt.figure(figsize=(8, 5))
+plt.plot(x, y1, 'b-', label='sin(x)')
+plt.xlabel('X-axis')
+plt.ylabel('Y-axis')
+plt.title('Exercise 1: Simple Line Plot')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+
+# Exercise 2:
+
+categories = ['A', 'B', 'C', 'D']
+values = [10, 30, 20, 15]
+plt.figure(figsize=(8, 5))
+plt.bar(categories, values, color='g')
+plt.xlabel('Categories')
+plt.ylabel('Frequency')
+plt.title('Exercise 2: Bar Chart')
+plt.grid(axis='y')
+plt.show()
+
+
+# Exercise 3:
+
+np.random.seed(0)
+x_scatter = np.random.rand(50)
+y_scatter = 2 * x_scatter + np.random.normal(0, 0.1, 50)
+plt.figure(figsize=(8, 5))
+plt.scatter(x_scatter, y_scatter, color='r', alpha=0.7)
+plt.xlabel('X-axis')
+plt.ylabel('Y-axis')
+plt.title('Exercise 3: Scatter Plot')
+plt.grid(True)
+plt.show()
+
+
+# Exercise 4:
+
+iris = sns.load_dataset('iris')
+plt.figure(figsize=(8, 8))
+sns.pairplot(iris)
+plt.suptitle('Exercise 4: Pairplot', y=1.02)
+plt.show()
+
+
+# Exercise 5:
+
+plt.figure(figsize=(8, 5))
+sns.boxplot(x='species', y='sepal_length', data=iris)
+plt.title('Exercise 5: Box Plot')
+plt.xlabel('Species')
+plt.ylabel('Sepal Length')
+plt.show()
+
+
+# Exercise 6:
+
+corr = iris.corr()
+plt.figure(figsize=(8, 5))
+sns.heatmap(corr, annot=True, cmap='coolwarm')
+plt.title('Exercise 6: Correlation Heatmap')
+plt.show()
+
+
+# Exercise 7:
+
+fig, axs = plt.subplots(2, 1, figsize=(8, 10))
+axs[0].plot(x, y1, 'b-', label='sin(x)')
+axs[0].set_title('Exercise 7: Subplot 1')
+axs[0].legend()
+axs[1].plot(x, y2, 'r-', label='cos(x)')
+axs[1].set_title('Exercise 7: Subplot 2')
+axs[1].legend()
+plt.tight_layout()
+plt.show()
+
+
+# Exercise 8:
+
+plt.figure(figsize=(8, 5))
+sns.scatterplot(x='sepal_length', y='sepal_width', hue='species', data=iris)
+plt.title('Exercise 8: Scatter Plot with Seaborn')
+plt.xlabel('Sepal Length')
+plt.ylabel('Sepal Width')
+plt.show()
+
+
+# Exercise 9:
+
+plt.figure(figsize=(8, 5))
+sns.violinplot(x='species', y='petal_length', data=iris)
+plt.title('Exercise 9: Violin Plot')
+plt.xlabel('Species')
+plt.ylabel('Petal Length')
+plt.show()
+
+
+# Exercise 10:
+
+plt.figure(figsize=(8, 5))
+sns.histplot(iris['sepal_length'], kde=True, color='skyblue')
+plt.title('Exercise 10: Histogram with KDE')
+plt.xlabel('Sepal Length')
+plt.ylabel('Frequency')
+plt.grid(True)
+plt.show()
