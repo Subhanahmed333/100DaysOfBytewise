@@ -258,4 +258,4 @@ for X_res, y_res, name in [(X_res_smote, y_res_smote, "SMOTE"), (X_res_adasyn, y
 
 
 
-#Example 10
+#Exercise 10
