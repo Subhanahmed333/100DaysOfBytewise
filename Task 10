@@ -71,6 +71,7 @@ print(wine_data_standardized.head())
 print(wine_data_standardized.describe())
 
 
+
 #Exercise 4
 
 import pandas as pd
@@ -104,5 +105,52 @@ print("\nDataset after removing outliers:")
 print(df_no_outliers.head())
 
 
+
 #Exercise 5
+
+import pandas as pd
+from sklearn.impute import KNNImputer
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
+
+df = pd.read_csv('retail_sales_dataset.csv')
+
+numerical_cols = df.select_dtypes(include=['int64', 'float64']).columns
+non_numerical_cols = df.select_dtypes(exclude=['int64', 'float64']).columns
+
+knn_imputer = KNNImputer(n_neighbors=5)
+df_numerical = df[numerical_cols]
+df_knn_imputed_numerical = pd.DataFrame(knn_imputer.fit_transform(df_numerical), columns=numerical_cols)
+
+df_knn_imputed = pd.concat([df_knn_imputed_numerical, df[non_numerical_cols]], axis=1)
+
+print("\nMissing values after KNN imputation:")
+print(df_knn_imputed.isnull().sum())
+
+mice_imputer = IterativeImputer(max_iter=10, random_state=0)
+df_mice_imputed_numerical = pd.DataFrame(mice_imputer.fit_transform(df_numerical), columns=numerical_cols)
+df_mice_imputed = pd.concat([df_mice_imputed_numerical, df[non_numerical_cols]], axis=1)
+
+print("\nMissing values after MICE imputation:")
+print(df_mice_imputed.isnull().sum())
+
+
+
+#Exercise 6
+
+import pandas as pd
+
+df = pd.read_csv('heart_disease_data.csv')
+
+df['age_group'] = pd.cut(df['age'], bins=[20, 40, 60, 80], labels=['young', 'adult', 'enior'])
+df['cholesterol_level'] = pd.cut(df['chol'], bins=[150, 200, 250, 300], labels=['normal', 'borderline', 'high'])
+df['bp_category'] = pd.cut(df['trestbps'], bins=[90, 120, 140, 160], labels=['normal', 'prehypertension', 'tage1'])
+df['risk_factors'] = (df['fbs'] > 0).astype(int) + (df['exang'] > 0).astype(int) + (df['oldpeak'] > 0).astype(int)
+df['avg_max_hr'] = df.groupby('sex')['thalach'].transform('mean')
+
+print(df.head())
+
+
+
+#Exercise 7
 
