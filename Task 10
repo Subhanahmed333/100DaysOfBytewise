@@ -49,3 +49,60 @@ print("\nLabel Encoded Dataset:\n", car_eval_label_encoded.head())
 
 #Exercise 3
 
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+
+wine_data = pd.read_csv('winequality-red.csv', sep=';')
+
+scaler = MinMaxScaler()
+wine_data_scaled = scaler.fit_transform(wine_data)
+wine_data_scaled = pd.DataFrame(wine_data_scaled, columns=wine_data.columns)
+
+print("Normalized Data:")
+print(wine_data_scaled.head())
+print(wine_data_scaled.describe())
+
+scaler = StandardScaler()
+wine_data_standardized = scaler.fit_transform(wine_data)
+wine_data_standardized = pd.DataFrame(wine_data_standardized, columns=wine_data.columns)
+
+print("\nStandardized Data:")
+print(wine_data_standardized.head())
+print(wine_data_standardized.describe())
+
+
+#Exercise 4
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy import stats
+
+df = pd.read_csv('HousingData.csv')
+
+z_scores = np.abs(stats.zscore(df))
+outliers_z = df[(z_scores > 3).any(axis=1)]
+
+Q1 = df.quantile(0.25)
+Q3 = df.quantile(0.75)
+IQR = Q3 - Q1
+outliers_iqr = df[~((df < (Q1 - 1.5 * IQR)) | (df > (Q3 + 1.5 * IQR))).any(axis=1)]
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=df)
+plt.title("Boxplot of Boston Housing Dataset")
+plt.show()
+
+df_no_outliers = df[~((df < (Q1 - 1.5 * IQR)) | (df > (Q3 + 1.5 * IQR))).any(axis=1)]
+
+print("Outliers using Z-score:")
+print(outliers_z)
+print("\nOutliers using IQR:")
+print(outliers_iqr)
+print("\nDataset after removing outliers:")
+print(df_no_outliers.head())
+
+
+#Exercise 5
+
