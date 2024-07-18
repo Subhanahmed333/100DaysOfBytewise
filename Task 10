@@ -151,6 +151,68 @@ df['avg_max_hr'] = df.groupby('sex')['thalach'].transform('mean')
 print(df.head())
 
 
-
 #Exercise 7
+
+import pandas as pd
+import numpy as np
+from scipy import stats
+
+df = pd.read_csv('day.csv')
+
+skewed_vars = ['temp', 'atemp', 'hum', 'windspeed']
+for var in skewed_vars:
+    print(f"{var}: {stats.skew(df[var])}")
+
+df['log_temp'] = np.log(df['temp'])
+df['log_atemp'] = np.log(df['atemp'])
+df['log_hum'] = np.log(df['hum'] + 1e-6)
+df['log_windspeed'] = np.log(df['windspeed'])
+
+df['sqrt_temp'] = np.sqrt(df['temp'])
+df['sqrt_atemp'] = np.sqrt(df['atemp'])
+df['sqrt_hum'] = np.sqrt(df['hum'] + 1e-6)
+df['sqrt_windspeed'] = np.sqrt(df['windspeed'])
+
+df['bc_temp'], _ = stats.boxcox(df['temp'])
+df['bc_atemp'], _ = stats.boxcox(df['atemp'])
+df['bc_hum'], _ = stats.boxcox(df['hum'] + 1e-6)
+df['bc_windspeed'], _ = stats.boxcox(df['windspeed'])
+
+print(df.head())
+
+
+#Exercise 8
+
+import pandas as pd
+from sklearn.feature_selection import SelectKBest, mutual_info_classif, RFE
+from sklearn.linear_model import LogisticRegression
+
+df = pd.read_csv('diabetes.csv')
+
+corr_matrix = df.corr()
+top_corr_features = corr_matrix['Outcome'].abs().sort_values(ascending=False).head(6).index.tolist()
+print("Top correlated features:", top_corr_features)
+
+X = df.drop('Outcome', axis=1)
+y = df['Outcome']
+mutual_info = mutual_info_classif(X, y)
+top_mutual_info_features = X.columns[np.argsort(mutual_info)][-5:].tolist()
+print("Top mutual information features:", top_mutual_info_features)
+
+log_reg = LogisticRegression()
+rfe = RFE(log_reg, n_features_to_select=5)
+rfe.fit(X, y)
+rfe_features = X.columns[rfe.support_].tolist()
+print("RFE features:", rfe_features)
+
+selector = SelectKBest(mutual_info_classif, k=5)
+selector.fit(X, y)
+select_kbest_features = X.columns[selector.get_support()].tolist()
+print("SelectKBest features:", select_kbest_features)
+
+
+
+#Exercise 9
+
+
 
