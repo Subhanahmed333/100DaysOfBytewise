@@ -1,0 +1,51 @@
+#Exercise 1
+
+import pandas as pd
+
+titanic = pd.read_csv('titanic.csv')
+print("Initial Data:\n", titanic.head())
+
+missing_values = titanic.isnull().sum()
+print("\nMissing Values:\n", missing_values)
+
+titanic['Age_mean_imputed'] = titanic['Age'].fillna(titanic['Age'].mean())
+titanic['Age_median_imputed'] = titanic['Age'].fillna(titanic['Age'].median())
+titanic['Embarked_mode_imputed'] = titanic['Embarked'].fillna(titanic['Embarked'].mode()[0])
+
+titanic_dropped_rows = titanic.dropna(subset=['Cabin'])
+titanic_dropped_column = titanic.drop(columns=['Cabin'])
+
+print("\nOriginal missing values:\n", missing_values)
+print("\nAfter mean imputation (Age):\n", titanic['Age_mean_imputed'].isnull().sum())
+print("After median imputation (Age):\n", titanic['Age_median_imputed'].isnull().sum())
+print("After mode imputation (Embarked):\n", titanic['Embarked_mode_imputed'].isnull().sum())
+print("After dropping rows with missing 'Cabin':\n", titanic_dropped_rows.isnull().sum())
+print("After dropping the 'Cabin' column:\n", titanic_dropped_column.isnull().sum())
+
+
+
+#Exercise 2
+
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+
+car_eval = pd.read_csv('car_evaluation.csv')
+
+print("Initial Data:\n", car_eval.head())
+print("\nData Types:\n", car_eval.dtypes)
+
+car_eval_one_hot = pd.get_dummies(car_eval)
+car_eval_label_encoded = car_eval.apply(LabelEncoder().fit_transform)
+
+print("\nOriginal dataset shape:", car_eval.shape)
+print("One-hot encoded dataset shape:", car_eval_one_hot.shape)
+print("Label encoded dataset shape:", car_eval_label_encoded.shape)
+
+print("\nOriginal Dataset:\n", car_eval.head())
+print("\nOne-Hot Encoded Dataset:\n", car_eval_one_hot.head())
+print("\nLabel Encoded Dataset:\n", car_eval_label_encoded.head())
+
+
+
+#Exercise 3
+
