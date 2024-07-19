@@ -259,3 +259,36 @@ for X_res, y_res, name in [(X_res_smote, y_res_smote, "SMOTE"), (X_res_adasyn, y
 
 
 #Exercise 10
+
+
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+
+ratings = pd.read_csv('ratings.csv')
+users = pd.read_csv('users.csv')
+movies = pd.read_csv('movies.csv')
+
+print("Ratings dataset:")
+print(ratings.shape)
+print(ratings.columns)
+
+print("\nUsers dataset:")
+print(users.shape)
+print(users.columns)
+
+print("\nMovies dataset:")
+print(movies.shape)
+print(movies.columns)
+
+ratings_users = pd.merge(ratings, users, on='userId')
+combined_data = pd.merge(ratings_users, movies, on='movieId')
+combined_data.fillna(combined_data.mean(), inplace=True)
+combined_data = pd.get_dummies(combined_data, columns=['gender', 'genres'])
+scaler = StandardScaler()
+combined_data[['age', 'rating']] = scaler.fit_transform(combined_data[['age', 'rating']])
+
+print("\nFinal combined dataset:")
+print(combined_data.shape)
+print(combined_data.columns)
+
+combined_data.to_csv('combined_data.csv', index=False)
