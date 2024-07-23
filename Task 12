@@ -57,3 +57,168 @@ print(classification_report(y_test, y_pred))
 #Exercise 2
 
 
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import roc_auc_score, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+data = pd.read_csv('creditcard.csv')
+print(data.isnull().sum())
+data = data.dropna()
+
+X = data.drop('Class', axis=1)
+y = data['Class']
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+dt_classifier = DecisionTreeClassifier(random_state=42)
+dt_classifier.fit(X_train, y_train)
+
+y_pred = dt_classifier.predict(X_test)
+y_pred_proba = dt_classifier.predict_proba(X_test)[:, 1]
+
+roc_auc = roc_auc_score(y_test, y_pred_proba)
+print(f"ROC-AUC Score: {roc_auc:.4f}")
+
+cm = confusion_matrix(y_test, y_pred)
+
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+plt.title('Confusion Matrix')
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.show()
+
+from sklearn.metrics import classification_report
+print(classification_report(y_test, y_pred))
+
+feature_importance = pd.DataFrame({'feature': X.columns, 'importance': dt_classifier.feature_importances_})
+feature_importance = feature_importance.sort_values('importance', ascending=False)
+print(feature_importance)
+
+plt.figure(figsize=(10, 6))
+sns.barplot(x='importance', y='feature', data=feature_importance.head(10))
+plt.title('Top 10 Feature Importances')
+plt.show()
+
+
+
+#Exercise 3
+
+
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.impute import SimpleImputer
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, roc_auc_score
+
+data = pd.read_csv('heart.csv')
+
+X = data.drop('target', axis=1)
+y = data['target']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+numerical_features = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
+categorical_features = ['sex', 'cp', 'fbs', 'restecg', 'exang', 'slope', 'ca', 'thal']
+
+numeric_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='mean')),
+    ('scaler', StandardScaler())
+])
+
+categorical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='most_frequent')),
+    ('onehot', OneHotEncoder(handle_unknown='ignore'))
+])
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', numeric_transformer, numerical_features),
+        ('cat', categorical_transformer, categorical_features)
+    ])
+
+model = Pipeline(steps=[('preprocessor', preprocessor),
+                        ('classifier', LogisticRegression())])
+
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+y_pred_proba = model.predict_proba(X_test)[:, 1]
+accuracy = accuracy_score(y_test, y_pred)
+roc_auc = roc_auc_score(y_test, y_pred_proba)
+
+print(f"Accuracy: {accuracy:.4f}")
+print(f"ROC-AUC: {roc_auc:.4f}")
+
+
+
+#Exerice 4
+
+
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df = pd.read_csv('emails.csv')
+
+df = df.dropna()
+print("Rows after handling missing values:", len(df))
+
+text_column = df.columns[0]
+target_column = df.columns[-1]
+
+X = df[text_column]
+y = df[target_column]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+vectorizer = TfidfVectorizer(stop_words='english', max_features=5000)
+X_train_vectorized = vectorizer.fit_transform(X_train)
+X_test_vectorized = vectorizer.transform(X_test)
+
+dt_classifier = DecisionTreeClassifier(random_state=42)
+dt_classifier.fit(X_train_vectorized, y_train)
+
+y_pred = dt_classifier.predict(X_test_vectorized)
+
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+
+cm = confusion_matrix(y_test, y_pred)
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+plt.title('Confusion Matrix')
+plt.ylabel('Actual')
+plt.xlabel('Predicted')
+plt.show()
+
+feature_importance = dt_classifier.feature_importances_
+feature_names = vectorizer.get_feature_names_out()
+sorted_idx = np.argsort(feature_importance)
+top_20_idx = sorted_idx[-20:]
+
+plt.figure(figsize=(12, 8))
+plt.barh(range(20), feature_importance[top_20_idx], align='center')
+plt.yticks(range(20), [feature_names[i] for i in top_20_idx])
+plt.xlabel('Feature Importance')
+plt.title('Top 20 Important Features for Spam Classification')
+plt.tight_layout()
+plt.show()
+
+
+
+#Exercise 5
+
+
