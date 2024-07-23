@@ -1,0 +1,59 @@
+#Exercise 1 
+
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import precision_score, recall_score, f1_score, classification_report
+
+data = pd.read_csv('HR.csv')
+
+X = data.drop('Attrition', axis=1)
+y = data['Attrition']
+
+numeric_features = X.select_dtypes(include=['int64', 'float64']).columns
+categorical_features = X.select_dtypes(include=['object']).columns
+
+numeric_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='median')),
+    ('scaler', StandardScaler())
+])
+
+categorical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
+    ('onehot', OneHotEncoder(handle_unknown='ignore'))
+])
+
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', numeric_transformer, numeric_features),
+        ('cat', categorical_transformer, categorical_features)
+    ])
+
+model = Pipeline(steps=[('preprocessor', preprocessor),
+                        ('classifier', LogisticRegression())])
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+precision = precision_score(y_test, y_pred, pos_label='Yes')
+recall = recall_score(y_test, y_pred, pos_label='Yes')
+f1 = f1_score(y_test, y_pred, pos_label='Yes')
+
+print(f"Precision: {precision:.2f}")
+print(f"Recall: {recall:.2f}")
+print(f"F1-score: {f1:.2f}")
+
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+
+
+
+#Exercise 2
+
+
