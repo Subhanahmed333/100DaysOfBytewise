@@ -222,3 +222,36 @@ plt.show()
 #Exercise 5
 
 
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix
+
+df = pd.read_csv('customer_satisfaction.csv')
+
+df.fillna(df.median(), inplace=True)
+
+df_encoded = pd.get_dummies(df, columns=['region'])
+
+numerical_features = ['feature1', 'feature2', 'feature3']  # replace with actual numerical feature names
+scaler = StandardScaler()
+df_encoded[numerical_features] = scaler.fit_transform(df_encoded[numerical_features])
+
+X = df_encoded.drop('satisfaction', axis=1)  # replace 'satisfaction' with the actual target column name
+y = df_encoded['satisfaction']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+accuracy = accuracy_score(y_test, y_pred)
+conf_matrix = confusion_matrix(y_test, y_pred)
+
+print(f'Accuracy: {accuracy}')
+print('Confusion Matrix:')
+print(conf_matrix)
+
+
