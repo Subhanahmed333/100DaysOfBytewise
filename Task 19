@@ -1,0 +1,148 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.cluster import KMeans, AgglomerativeClustering
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.metrics import silhouette_score, davies_bouldin_score
+from scipy.cluster.hierarchy import dendrogram, linkage
+from sklearn.datasets import load_iris
+
+# 1. Dataset Selection and Initial Analysis
+
+iris = load_iris()
+iris_df = pd.DataFrame(data=np.c_[iris['data'], iris['target']],
+                       columns=iris['feature_names'] + ['target'])
+
+mall_df = pd.read_csv('Mall_Customers.csv')
+
+def perform_eda(df, title):
+    print(f"\nExploratory Data Analysis for {title} dataset:")
+    print(df.head())
+    print("\nDataset Info:")
+    print(df.info())
+    print("\nDescriptive Statistics:")
+    print(df.describe())
+
+    numerical_cols = df.select_dtypes(include=[np.number]).columns
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(df[numerical_cols].corr(), annot=True, cmap='coolwarm')
+    plt.title(f"Correlation Heatmap - {title}")
+    plt.show()
+    
+    df[numerical_cols].hist(figsize=(12, 10))
+    plt.suptitle(f"Feature Distributions - {title}")
+    plt.tight_layout()
+    plt.show()
+
+perform_eda(iris_df, "Iris")
+perform_eda(mall_df, "Mall Customers")
+
+# 2. Implementing Clustering Algorithms
+
+def elbow_method(data, max_k):
+    wcss = []
+    for k in range(1, max_k+1):
+        kmeans = KMeans(n_clusters=k, init='k-means++', random_state=42)
+        kmeans.fit(data)
+        wcss.append(kmeans.inertia_)
+    
+    plt.figure(figsize=(10, 6))
+    plt.plot(range(1, max_k+1), wcss, marker='o')
+    plt.title('Elbow Method')
+    plt.xlabel('Number of clusters')
+    plt.ylabel('WCSS')
+    plt.show()
+
+def apply_kmeans(data, n_clusters):
+    kmeans = KMeans(n_clusters=n_clusters, init='k-means++', random_state=42)
+    cluster_labels = kmeans.fit_predict(data)
+    return cluster_labels
+
+def apply_hierarchical(data, n_clusters, linkage_type='ward'):
+    hierarchical = AgglomerativeClustering(n_clusters=n_clusters, linkage=linkage_type)
+    cluster_labels = hierarchical.fit_predict(data)
+    return cluster_labels
+
+def plot_dendrogram(data, title):
+    plt.figure(figsize=(10, 7))
+    dendrogram(linkage(data, method='ward'))
+    plt.title(f'Dendrogram - {title}')
+    plt.xlabel('Sample Index')
+    plt.ylabel('Euclidean Distance')
+    plt.show()
+
+iris_features = iris_df.drop('target', axis=1)
+mall_features = mall_df.drop(['CustomerID', 'Genre'], axis=1)
+
+scaler = StandardScaler()
+iris_scaled = scaler.fit_transform(iris_features)
+mall_scaled = scaler.fit_transform(mall_features)
+
+print("\nClustering for Iris dataset:")
+elbow_method(iris_scaled, 10)
+plot_dendrogram(iris_scaled, "Iris")
+iris_kmeans_labels = apply_kmeans(iris_scaled, 3)
+iris_hierarchical_labels = apply_hierarchical(iris_scaled, 3)
+
+print("\nClustering for Mall Customers dataset:")
+elbow_method(mall_scaled, 10)
+plot_dendrogram(mall_scaled, "Mall Customers")
+mall_kmeans_labels = apply_kmeans(mall_scaled, 5)
+mall_hierarchical_labels = apply_hierarchical(mall_scaled, 5)
+
+# 3. Cluster Visualization and Interpretation
+
+def visualize_clusters(data, labels, title):
+    pca = PCA(n_components=2)
+    data_2d = pca.fit_transform(data)
+    
+    plt.figure(figsize=(10, 8))
+    scatter = plt.scatter(data_2d[:, 0], data_2d[:, 1], c=labels, cmap='viridis')
+    plt.title(f'Cluster Visualization - {title}')
+    plt.xlabel('First Principal Component')
+    plt.ylabel('Second Principal Component')
+    plt.colorbar(scatter)
+    plt.show()
+
+visualize_clusters(iris_scaled, iris_kmeans_labels, "Iris - K-Means")
+visualize_clusters(iris_scaled, iris_hierarchical_labels, "Iris - Hierarchical")
+visualize_clusters(mall_scaled, mall_kmeans_labels, "Mall Customers - K-Means")
+visualize_clusters(mall_scaled, mall_hierarchical_labels, "Mall Customers - Hierarchical")
+
+# 4. Exploratory Analysis and Insights
+
+def analyze_clusters(data, labels, feature_names, title):
+    df = pd.DataFrame(data, columns=feature_names)
+    df['Cluster'] = labels
+    
+    print(f"\nCluster Analysis for {title}:")
+    for cluster in range(len(np.unique(labels))):
+        print(f"\nCluster {cluster}:")
+        print(df[df['Cluster'] == cluster].describe().mean())
+
+analyze_clusters(iris_scaled, iris_kmeans_labels, iris_features.columns, "Iris - K-Means")
+analyze_clusters(iris_scaled, iris_hierarchical_labels, iris_features.columns, "Iris - Hierarchical")
+analyze_clusters(mall_scaled, mall_kmeans_labels, mall_features.columns, "Mall Customers - K-Means")
+analyze_clusters(mall_scaled, mall_hierarchical_labels, mall_features.columns, "Mall Customers - Hierarchical")
+
+# 5. Comparison and Reporting
+
+def calculate_metrics(data, labels):
+    silhouette = silhouette_score(data, labels)
+    davies_bouldin = davies_bouldin_score(data, labels)
+    return silhouette, davies_bouldin
+
+print("\nClustering Metrics:")
+print("Iris Dataset:")
+print("K-Means - Silhouette Score:", calculate_metrics(iris_scaled, iris_kmeans_labels)[0])
+print("K-Means - Davies-Bouldin Index:", calculate_metrics(iris_scaled, iris_kmeans_labels)[1])
+print("Hierarchical - Silhouette Score:", calculate_metrics(iris_scaled, iris_hierarchical_labels)[0])
+print("Hierarchical - Davies-Bouldin Index:", calculate_metrics(iris_scaled, iris_hierarchical_labels)[1])
+
+print("\nMall Customers Dataset:")
+print("K-Means - Silhouette Score:", calculate_metrics(mall_scaled, mall_kmeans_labels)[0])
+print("K-Means - Davies-Bouldin Index:", calculate_metrics(mall_scaled, mall_kmeans_labels)[1])
+print("Hierarchical - Silhouette Score:", calculate_metrics(mall_scaled, mall_hierarchical_labels)[0])
+print("Hierarchical - Davies-Bouldin Index:", calculate_metrics(mall_scaled, mall_hierarchical_labels)[1])
