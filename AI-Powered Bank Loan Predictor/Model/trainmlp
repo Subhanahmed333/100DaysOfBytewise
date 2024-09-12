@@ -1,0 +1,128 @@
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.impute import SimpleImputer
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import EarlyStopping
+import joblib
+import json
+import matplotlib.pyplot as plt
+
+# Load the datasets
+train_data = pd.read_csv('train.csv')
+test_data = pd.read_csv('test.csv')
+
+# Combine the datasets
+data = pd.concat([train_data, test_data], axis=0, ignore_index=True)
+
+# Drop unnecessary columns
+data = data.drop(['Loan_ID'], axis=1)
+
+# Handle missing values
+numeric_columns = ['LoanAmount', 'Loan_Amount_Term', 'Credit_History']
+categorical_columns = ['Gender', 'Married', 'Dependents', 'Education', 'Self_Employed', 'Property_Area']
+
+# Impute numeric columns with median
+numeric_imputer = SimpleImputer(strategy='median')
+data[numeric_columns] = numeric_imputer.fit_transform(data[numeric_columns])
+
+# Impute categorical columns with mode
+categorical_imputer = SimpleImputer(strategy='most_frequent')
+data[categorical_columns] = categorical_imputer.fit_transform(data[categorical_columns])
+
+# Encode categorical variables
+le_dict = {}
+for col in categorical_columns:
+    le = LabelEncoder()
+    data[col] = le.fit_transform(data[col].astype(str))
+    le_dict[col] = le
+
+# Prepare features and target
+X = data.drop('Loan_Status', axis=1)
+y = data['Loan_Status']
+
+# Encode target variable
+le_loan_status = LabelEncoder()
+y = le_loan_status.fit_transform(y.astype(str))
+le_dict['Loan_Status'] = le_loan_status
+
+# Split the data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Scale the features
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Define the MLP model
+model = Sequential([
+    Dense(128, activation='relu', input_shape=(X_train.shape[1],)),
+    Dropout(0.3),
+    Dense(64, activation='relu'),
+    Dropout(0.3),
+    Dense(32, activation='relu'),
+    Dense(1, activation='sigmoid')
+])
+
+# Compile the model
+model.compile(optimizer=Adam(learning_rate=0.001),
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+
+# Define early stopping
+early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
+
+# Train the model
+history = model.fit(X_train_scaled, y_train,
+                    validation_split=0.2,
+                    epochs=200,
+                    batch_size=32,
+                    callbacks=[early_stopping],
+                    verbose=1)
+
+# Evaluate the model
+loss, accuracy = model.evaluate(X_test_scaled, y_test, verbose=0)
+print(f"Test accuracy: {accuracy:.4f}")
+
+# Save the MLP model
+model.save('./Model/MLP_Model.keras')
+print("MLP Model saved as MLP_Model.keras")
+
+# Save the scaler (if not already saved)
+joblib.dump(scaler, './Model/scaler.joblib')
+print("Scaler saved as scaler.joblib")
+
+# Save the label encoders (if not already saved)
+joblib.dump(le_dict, './Model/label_encoders.joblib')
+print("Label encoders saved as label_encoders.joblib")
+
+# Save the column names (if not already saved)
+with open('./Model/column_names.json', 'w') as f:
+    json.dump(list(X.columns), f)
+print("Column names saved as column_names.json")
+
+# Plot training history
+plt.figure(figsize=(12, 4))
+plt.subplot(1, 2, 1)
+plt.plot(history.history['accuracy'], label='Training Accuracy')
+plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+plt.title('Model Accuracy')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.legend()
+
+plt.subplot(1, 2, 2)
+plt.plot(history.history['loss'], label='Training Loss')
+plt.plot(history.history['val_loss'], label='Validation Loss')
+plt.title('Model Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+
+plt.tight_layout()
+plt.savefig('./Model/mlp_training_history.png')
+print("Training history plot saved as mlp_training_history.png")
